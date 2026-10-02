@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Áquila | Monitoramento Hídrico</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">A</div>
+      <div>
+        <strong>Áquila</strong>
+        <span>Monitoramento Hídrico</span>
+      </div>
+    </div>
+
+    <nav>
+      <button class="nav-item active" data-page="dashboard">◉ <span>Visão Geral</span></button>
+      <button class="nav-item" data-page="historico">▤ <span>Histórico</span></button>
+      <button class="nav-item" data-page="graficos">⌁ <span>Gráficos</span></button>
+      <button class="nav-item" data-page="alertas">⚠ <span>Alertas</span><b id="alertBadge">0</b></button>
+      <button class="nav-item" data-page="config">⚙ <span>Configurações</span></button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="api-card">
+        <span class="status-dot" id="apiDot"></span>
+        <div>
+          <strong id="apiText">API conectando...</strong>
+          <small>localhost:8080</small>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">Visão Geral</h1>
+        <p id="clock">--/--/---- --:--:--</p>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" id="refreshBtn" title="Atualizar">↻</button>
+        <div class="connection"><span class="status-dot"></span> Sistema online</div>
+      </div>
+    </header>
+
+    <section id="dashboard" class="page active">
+      <div class="reservoir-grid">
+
+  <!-- RESERVATÓRIO 1 -->
+  <article class="card water-card">
+
+    <div class="card-head">
+      <div>
+        <span class="eyebrow">RESERVATÓRIO 1</span>
+        <h2 id="levelPercent1">--%</h2>
+      </div>
+
+      <span class="pill">Sensor 1</span>
+    </div>
+
+    <div class="tank-wrap">
+
+      <div class="tank">
+        <div class="water" id="waterFill1"></div>
+        <div class="tank-lines"></div>
+        <span id="tankLabel1">-- cm</span>
+      </div>
+
+      <div class="tank-info">
+
+        <div>
+          <span>Nível</span>
+          <strong id="volumeValue1">-- cm</strong>
+        </div>
+
+        <div>
+          <span>Altura</span>
+          <strong>74 cm</strong>
+        </div>
+
+        <div>
+          <span>Sensor</span>
+          <strong>Ativo</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+  </article>
+
+
+  <!-- RESERVATÓRIO 2 -->
+  <article class="card water-card">
+
+    <div class="card-head">
+      <div>
+        <span class="eyebrow">RESERVATÓRIO 2</span>
+        <h2 id="levelPercent2">--%</h2>
+      </div>
+
+      <span class="pill">Sensor 2</span>
+    </div>
+
+    <div class="tank-wrap">
+
+      <div class="tank">
+        <div class="water" id="waterFill2"></div>
+        <div class="tank-lines"></div>
+        <span id="tankLabel2">-- cm</span>
+      </div>
+
+      <div class="tank-info">
+
+        <div>
+          <span>Nível</span>
+          <strong id="volumeValue2">-- cm</strong>
+        </div>
+
+        <div>
+          <span>Altura</span>
+          <strong>84 cm</strong>
+        </div>
+
+        <div>
+          <span>Sensor</span>
+          <strong>Ativo</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+  </article>
+
+</div>
+
+
+<!-- ESTATÍSTICAS -->
+<div class="stats-grid">
+
+  <article class="card stat-card">
+    <span class="eyebrow">VAZÃO</span>
+    <strong id="flowValue">-- L/min</strong>
+    <small>Leitura do sensor</small>
+  </article>
+
+  <article class="card stat-card">
+    <span class="eyebrow">SENSORES</span>
+    <strong id="sensorValue">--</strong>
+    <small>Comunicação</small>
+  </article>
+
+  <article class="card stat-card">
+    <span class="eyebrow">ATUALIZAÇÃO</span>
+    <strong id="lastUpdate">--:--:--</strong>
+    <small>Última leitura</small>
+  </article>
+
+</div>
+    </section>
+
+    <section id="historico" class="page">
+      <article class="card">
+        <div class="card-head">
+          <div><span class="eyebrow">REGISTROS</span><h3>Histórico de medições</h3></div>
+          <button class="primary-btn" id="exportBtn">Exportar CSV</button>
+        </div>
+        <div class="toolbar">
+          <input id="historySearch" type="search" placeholder="Pesquisar por data, nível ou bomba...">
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Data/hora</th><th>Nível</th><th>Volume</th><th>Vazão</th><th>Sensor</th></tr></thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="graficos" class="page">
+      <div class="stats-grid chart-stats">
+        <article class="card stat-card"><span class="eyebrow">MÉDIA</span><strong id="avgLevel">--%</strong><small>nível registrado</small></article>
+        <article class="card stat-card"><span class="eyebrow">MÍNIMO</span><strong id="minLevel">--%</strong><small>no período</small></article>
+        <article class="card stat-card"><span class="eyebrow">MÁXIMO</span><strong id="maxLevel">--%</strong><small>no período</small></article>
+      </div>
+      <article class="card chart-card big-chart">
+        <div class="card-head">
+          <div><span class="eyebrow">ANÁLISE</span><h3>Nível ao longo das medições</h3></div>
+          <div class="segmented"><button class="active" data-range="24">24h</button><button data-range="7">7 dias</button></div>
+        </div>
+        <canvas id="bigChart" height="220"></canvas>
+      </article>
+    </section>
+
+    <section id="alertas" class="page">
+      <article class="card">
+        <div class="card-head">
+          <div><span class="eyebrow">MONITORAMENTO</span><h3>Alertas do sistema</h3></div>
+          <button class="outline-btn" id="readAllBtn">Marcar como lidos</button>
+        </div>
+        <div id="alertsList" class="alerts-list"></div>
+      </article>
+    </section>
+
+    <section id="config" class="page">
+      <article class="card settings-card">
+        <div class="card-head">
+          <div><span class="eyebrow">PARÂMETROS</span><h3>Configurações do reservatório</h3></div>
+        </div>
+        <form id="settingsForm">
+          <div class="form-grid">
+            <label>Capacidade (L)<input type="number" id="capacityInput" min="1" required></label>
+            <label>Altura (m)<input type="number" id="heightInput" min="0.1" step="0.1" required></label>
+            <label>Nível mínimo (%)<input type="number" id="minInput" min="0" max="100" required></label>
+            <label>Nível máximo (%)<input type="number" id="maxInput" min="0" max="100" required></label>
+            <label>Calibração do sensor<input type="number" id="calibrationInput" step="0.01" required></label>
+          </div>
+          <div class="settings-actions">
+            <button type="button" class="outline-btn" id="resetBtn">Restaurar padrão</button>
+            <button type="submit" class="primary-btn">Salvar configurações</button>
+          </div>
+        </form>
+      </article>
+      <article class="card api-info">
+        <span class="eyebrow">API</span>
+        <h3>Endpoints disponíveis</h3>
+        <div class="endpoint-grid">
+          <code>GET /api/status</code><code>GET /api/historico</code><code>GET /api/alertas</code>
+          <code>GET /api/configuracoes</code><code>POST /api/sensor</code>
+          <code>POST /api/configuracoes</code><code>POST /api/calibracao</code><code>GET /api/health</code>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>
