@@ -1,12 +1,14 @@
-const mariadb = require('mariadb');
+const { Pool } = require('pg');
 
-const pool = mariadb.createPool({
-    host: '127.0.0.1',
-    port: 3307,
-    user: 'root',
-    password: process.env.DB_PASSWORD,
-    database: 'aquila',
-    connectionLimit: 5
+const pool = new Pool({
+    host: process.env.PGHOST,
+    port: Number(process.env.PGPORT || 5432),
+    user: process.env.PGUSER,
+    password: process.env.PGPASSWORD,
+    database: process.env.PGDATABASE,
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
 module.exports = pool;
