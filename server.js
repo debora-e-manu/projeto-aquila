@@ -2,6 +2,11 @@ const express = require('express');
 const path = require('path');
 const pool = require('./db');
 
+console.log("MYSQLHOST:", process.env.MYSQLHOST);
+console.log("MYSQLPORT:", process.env.MYSQLPORT);
+console.log("MYSQLUSER:", process.env.MYSQLUSER);
+console.log("MYSQLDATABASE:", process.env.MYSQLDATABASE);
+
 const app = express();
 
 app.use(express.json());
