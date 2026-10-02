@@ -6,6 +6,7 @@ console.log("MYSQLHOST:", process.env.MYSQLHOST);
 console.log("MYSQLPORT:", process.env.MYSQLPORT);
 console.log("MYSQLUSER:", process.env.MYSQLUSER);
 console.log("MYSQLDATABASE:", process.env.MYSQLDATABASE);
+console.log("MYSQLPASSWORD existe:", !!process.env.MYSQLPASSWORD);
 
 const app = express();
 
