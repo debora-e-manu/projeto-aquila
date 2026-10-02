@@ -30,15 +30,11 @@ app.post('/api/medicoes', async (req, res) => {
 
     const { nivel1, nivel2, vazao } = req.body;
 
-    let conn;
-
     try {
 
-        conn = await pool.getConnection();
-
-        await conn.query(
+        await pool.query(
             `INSERT INTO medicoes (nivel1, nivel2, vazao)
-             VALUES (?, ?, ?)`,
+             VALUES ($1, $2, $3)`,
             [nivel1, nivel2, vazao]
         );
 
@@ -54,12 +50,6 @@ app.post('/api/medicoes', async (req, res) => {
             erro: 'Erro ao salvar medição'
         });
 
-    } finally {
-
-        if (conn) {
-            conn.release();
-        }
-
     }
 });
 
@@ -70,19 +60,15 @@ app.post('/api/medicoes', async (req, res) => {
 
 app.get('/api/medicoes', async (req, res) => {
 
-    let conn;
-
     try {
 
-        conn = await pool.getConnection();
-
-        const medicoes = await conn.query(
+        const resultado = await pool.query(
             `SELECT id, nivel1, nivel2, vazao, data_hora
              FROM medicoes
              ORDER BY id DESC`
         );
 
-        res.json(medicoes);
+        res.json(resultado.rows);
 
     } catch (erro) {
 
@@ -91,12 +77,6 @@ app.get('/api/medicoes', async (req, res) => {
         res.status(500).json({
             erro: 'Erro ao buscar medições'
         });
-
-    } finally {
-
-        if (conn) {
-            conn.release();
-        }
 
     }
 });
@@ -108,38 +88,28 @@ app.get('/api/medicoes', async (req, res) => {
 
 app.get('/api/status', async (req, res) => {
 
-    let conn;
-
     try {
 
-        conn = await pool.getConnection();
-
-        const resultado = await conn.query(
+        const resultado = await pool.query(
             `SELECT nivel1, nivel2, vazao, data_hora
              FROM medicoes
              ORDER BY id DESC
              LIMIT 1`
         );
 
-        if (resultado.length === 0) {
+        if (resultado.rows.length === 0) {
 
             return res.json({
-                nivel: 0,
-                volume: 0,
+                nivel1: 0,
+                nivel2: 0,
                 vazao: 0,
-                bomba: false,
                 sensor: 'sem dados',
                 timestamp: null
             });
 
         }
 
-        const ultima = resultado[0];
-
-        // Usaremos o reservatório 2 como nível principal
-        // até adaptarmos o dashboard para mostrar os dois.
-        const nivelPercentual =
-            (Number(ultima.nivel2) / 84) * 100;
+        const ultima = resultado.rows[0];
 
         res.json({
             nivel1: Number(ultima.nivel1),
@@ -157,12 +127,6 @@ app.get('/api/status', async (req, res) => {
             erro: 'Erro ao buscar status'
         });
 
-    } finally {
-
-        if (conn) {
-            conn.release();
-        }
-
     }
 });
 
@@ -173,22 +137,17 @@ app.get('/api/status', async (req, res) => {
 
 app.get('/api/historico', async (req, res) => {
 
-    let conn;
-
     try {
 
-        conn = await pool.getConnection();
-
-        const resultado = await conn.query(
+        const resultado = await pool.query(
             `SELECT nivel1, nivel2, vazao, data_hora
              FROM medicoes
              ORDER BY id ASC`
         );
 
-        const historico = resultado.map(item => {
+        const historico = resultado.rows.map(item => {
 
-            const nivel =
-                (Number(item.nivel2) / 84) * 100;
+            const nivel = (Number(item.nivel2) / 84) * 100;
 
             return {
                 timestamp: item.data_hora,
@@ -209,12 +168,6 @@ app.get('/api/historico', async (req, res) => {
         res.status(500).json({
             erro: 'Erro ao buscar histórico'
         });
-
-    } finally {
-
-        if (conn) {
-            conn.release();
-        }
 
     }
 });
@@ -273,11 +226,13 @@ app.get('/api/health', (req, res) => {
 // INICIAR SERVIDOR
 // ========================================
 
-app.listen(3000, () => {
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, '0.0.0.0', () => {
 
     console.log('====================================');
     console.log('🚀 ÁQUILA ONLINE');
-    console.log('🌐 http://localhost:3000');
+    console.log(`🌐 Porta: ${PORT}`);
     console.log('====================================');
 
 });
