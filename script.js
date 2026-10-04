@@ -107,26 +107,7 @@ function applyStatus(s){
 
 
 
-  $("#contactValue").textContent =
-    fmtTime(s.timestamp);
-
-  $("#sensorPill").textContent =
-    "Sensores ativos";
-
-  $("#levelSensor").textContent =
-    "ATIVO";
-
-  $("#flowSensor").textContent =
-    "ATIVO";
-
-  $("#levelSensor").className = "ok";
-  $("#flowSensor").className = "ok";
-
-  $("#capacityValue").textContent =
-    (configData.capacidade || 0) + " L";
-
-  $("#heightValue").textContent =
-    (configData.altura || 0) + " m";
+  
 }
 async function loadAll(){
   try{
