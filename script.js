@@ -105,8 +105,7 @@ function applyStatus(s){
   $("#sensorValue").textContent =
     s.sensor ? s.sensor.toUpperCase() : "ATIVO";
 
-  $("#lastUpdate").textContent =
-    fmtTime(s.timestamp);
+
 
   $("#contactValue").textContent =
     fmtTime(s.timestamp);
