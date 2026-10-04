@@ -137,7 +137,11 @@ async function loadAll(){
     const c = await api("/configuracoes");
     configData=c;historyData=h;alertsData=a;applyStatus(s);renderMainChart();renderHistory();renderAlerts();fillSettings();
     $("#apiDot").style.background="#27d17f";$("#apiText").textContent="API conectada";
-  }catch(e){$("#apiDot").style.background="#e35b67";$("#apiDot").style.boxShadow="0 0 10px #e35b67";$("#apiText").textContent="API offline"}
+  }catch(e){
+  console.error("ERRO NO PAINEL:", e);
+  $("#apiDot").style.background="#e35b67";
+  $("#apiDot").style.boxShadow="0 0 10px #e35b67";
+  $("#apiText").textContent="API offline";
 }
 $("#refreshBtn").onclick=async()=>{await loadAll();toast("Dados atualizados")};
 $("#historySearch").oninput=renderHistory;
