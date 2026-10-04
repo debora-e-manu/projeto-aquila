@@ -58,7 +58,7 @@ function applyStatus(s){
   const nivel1 = Number(s.nivel1 || 0);
 
   const percentual1 =
-    Math.max(0, Math.min(100, (nivel1 / 74) * 100));
+    Math.max(0, Math.min(100, (nivel1 / 20) * 100));
 
   $("#levelPercent1").textContent =
     percentual1.toFixed(0) + "%";
@@ -80,7 +80,7 @@ function applyStatus(s){
   const nivel2 = Number(s.nivel2 || 0);
 
   const percentual2 =
-    Math.max(0, Math.min(100, (nivel2 / 84) * 100));
+    Math.max(0, Math.min(100, (nivel2 / 10) * 100));
 
   $("#levelPercent2").textContent =
     percentual2.toFixed(0) + "%";
