@@ -131,7 +131,10 @@ function applyStatus(s){
 }
 async function loadAll(){
   try{
-    const [s,h,a,c]=await Promise.all([api("/status"),api("/historico"),api("/alertas"),api("/configuracoes")]);
+    const s = await api("/status");
+    const h = await api("/historico");
+    const a = await api("/alertas");
+    const c = await api("/configuracoes");
     configData=c;historyData=h;alertsData=a;applyStatus(s);renderMainChart();renderHistory();renderAlerts();fillSettings();
     $("#apiDot").style.background="#27d17f";$("#apiText").textContent="API conectada";
   }catch(e){$("#apiDot").style.background="#e35b67";$("#apiDot").style.boxShadow="0 0 10px #e35b67";$("#apiText").textContent="API offline"}
