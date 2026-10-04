@@ -135,7 +135,14 @@ async function loadAll(){
     const h = await api("/historico");
     const a = await api("/alertas");
     const c = await api("/configuracoes");
-    configData=c;historyData=h;alertsData=a;applyStatus(s);renderMainChart();renderHistory();renderAlerts();fillSettings();
+    configData=c;
+historyData=h;
+alertsData=a;
+
+applyStatus(s);
+
+$("#apiDot").style.background="#27d17f";
+$("#apiText").textContent="API conectada";
     $("#apiDot").style.background="#27d17f";$("#apiText").textContent="API conectada";
   }catch(e){
   console.error("ERRO NO PAINEL:", e);
