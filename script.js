@@ -149,6 +149,7 @@ $("#apiText").textContent="API conectada";
   $("#apiDot").style.background="#e35b67";
   $("#apiDot").style.boxShadow="0 0 10px #e35b67";
   $("#apiText").textContent="API offline";
+  }
 }
 $("#refreshBtn").onclick=async()=>{await loadAll();toast("Dados atualizados")};
 $("#historySearch").oninput=renderHistory;
