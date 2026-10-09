@@ -26,20 +26,24 @@ app.get('/', (req, res) => {
 // SALVAR MEDIÇÃO DO ESP32
 // ========================================
 
+
 app.post('/api/medicoes', async (req, res) => {
 
-    const { nivel1, nivel2, vazao } = req.body;
+    const { nivel1, nivel2, vazao, bomba } = req.body;
+
+    const estadoBomba = bomba === 'ligada' ? 'ligada' : 'desligada';
 
     try {
 
         await pool.query(
-            `INSERT INTO medicoes (nivel1, nivel2, vazao)
-             VALUES ($1, $2, $3)`,
-            [nivel1, nivel2, vazao]
+            `INSERT INTO medicoes (nivel1, nivel2, vazao, bomba)
+             VALUES ($1, $2, $3, $4)`,
+            [nivel1, nivel2, vazao, estadoBomba]
         );
 
         res.json({
-            mensagem: 'Medição salva com sucesso!'
+            mensagem: 'Medição salva com sucesso!',
+            bomba: estadoBomba
         });
 
     } catch (erro) {
@@ -54,32 +58,45 @@ app.post('/api/medicoes', async (req, res) => {
 });
 
 
+    }
+});
+
+
 // ========================================
 // BUSCAR MEDIÇÕES
 // ========================================
 
-app.get('/api/medicoes', async (req, res) => {
+
+app.post('/api/medicoes', async (req, res) => {
+
+    const { nivel1, nivel2, vazao, bomba } = req.body;
+
+    const estadoBomba = bomba === 'ligada' ? 'ligada' : 'desligada';
 
     try {
 
-        const resultado = await pool.query(
-            `SELECT id, nivel1, nivel2, vazao, data_hora
-             FROM medicoes
-             ORDER BY id DESC`
+        await pool.query(
+            `INSERT INTO medicoes (nivel1, nivel2, vazao, bomba)
+             VALUES ($1, $2, $3, $4)`,
+            [nivel1, nivel2, vazao, estadoBomba]
         );
 
-        res.json(resultado.rows);
+        res.json({
+            mensagem: 'Medição salva com sucesso!',
+            bomba: estadoBomba
+        });
 
     } catch (erro) {
 
-        console.error('Erro ao buscar medições:', erro);
+        console.error('Erro ao salvar medição:', erro);
 
         res.status(500).json({
-            erro: 'Erro ao buscar medições'
+            erro: 'Erro ao salvar medição'
         });
 
     }
 });
+
 
 
 
