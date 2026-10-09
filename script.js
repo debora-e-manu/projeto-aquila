@@ -49,6 +49,7 @@ function renderAlerts(){
   $("#alertsList").innerHTML=alertsData.map(a=>`<div class="alert ${a.lida?"":"unread"}"><div class="alert-icon">!</div><div><div class="alert-title">${a.titulo}</div><small>${a.mensagem} • ${new Date(a.timestamp).toLocaleString("pt-BR")}</small></div></div>`).join("") || "<p style='color:#66809a'>Nenhum alerta registrado.</p>";
   const unread=alertsData.filter(a=>!a.lida).length;$("#alertBadge").textContent=unread;$("#alertBadge").style.display=unread?"block":"none";
 }
+
 function applyStatus(s){
 
   // =========================
@@ -56,59 +57,48 @@ function applyStatus(s){
   // =========================
 
   const nivel1 = Number(s.nivel1 || 0);
+  const percentual1 = Math.max(0, Math.min(100, (nivel1 / 20) * 100));
 
-  const percentual1 =
-    Math.max(0, Math.min(100, (nivel1 / 20) * 100));
-
-  $("#levelPercent1").textContent =
-    percentual1.toFixed(0) + "%";
-
-  $("#waterFill1").style.height =
-    percentual1 + "%";
-
-  $("#tankLabel1").textContent =
-    nivel1.toFixed(2) + " cm";
-
-  $("#volumeValue1").textContent =
-    nivel1.toFixed(2) + " cm";
-
+  $("#levelPercent1").textContent = percentual1.toFixed(0) + "%";
+  $("#waterFill1").style.height = percentual1 + "%";
+  $("#tankLabel1").textContent = nivel1.toFixed(2) + " cm";
+  $("#volumeValue1").textContent = nivel1.toFixed(2) + " cm";
 
   // =========================
   // RESERVATÓRIO 2
   // =========================
 
   const nivel2 = Number(s.nivel2 || 0);
+  const percentual2 = Math.max(0, Math.min(100, (nivel2 / 10) * 100));
 
-  const percentual2 =
-    Math.max(0, Math.min(100, (nivel2 / 10) * 100));
-
-  $("#levelPercent2").textContent =
-    percentual2.toFixed(0) + "%";
-
-  $("#waterFill2").style.height =
-    percentual2 + "%";
-
-  $("#tankLabel2").textContent =
-    nivel2.toFixed(2) + " cm";
-
-  $("#volumeValue2").textContent =
-    nivel2.toFixed(2) + " cm";
-
+  $("#levelPercent2").textContent = percentual2.toFixed(0) + "%";
+  $("#waterFill2").style.height = percentual2 + "%";
+  $("#tankLabel2").textContent = nivel2.toFixed(2) + " cm";
+  $("#volumeValue2").textContent = nivel2.toFixed(2) + " cm";
 
   // =========================
   // OUTRAS INFORMAÇÕES
   // =========================
 
-  $("#flowValue").textContent =
-    Number(s.vazao || 0).toFixed(1) + " L/min";
+  $("#flowValue").textContent = Number(s.vazao || 0).toFixed(1) + " L/min";
+  $("#sensorValue").textContent = s.sensor ? s.sensor.toUpperCase() : "SEM DADOS";
 
-  $("#sensorValue").textContent =
-    s.sensor ? s.sensor.toUpperCase() : "ATIVO";
+  // =========================
+  // ESTADO DA BOMBA
+  // =========================
 
+  const bombaElement = $("#pumpStatus");
 
-
-  
+  if (bombaElement) {
+    if (s.sensor === "ativo" && s.bomba) {
+      bombaElement.textContent =
+        s.bomba === "ligada" ? "BOMBA LIGADA" : "BOMBA DESLIGADA";
+    } else {
+      bombaElement.textContent = "SEM COMUNICAÇÃO";
+    }
+  }
 }
+
 async function loadAll(){
   try{
     const s = await api("/status");
