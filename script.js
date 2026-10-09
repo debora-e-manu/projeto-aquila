@@ -97,6 +97,26 @@ function applyStatus(s){
       bombaElement.textContent = "SEM COMUNICAÇÃO";
     }
   }
+
+  // Horário da última medição recebida
+  const ultimaLeitura = $("#lastUpdate");
+
+  if (ultimaLeitura) {
+    if (s.timestamp) {
+      const data = new Date(s.timestamp);
+
+      ultimaLeitura.textContent = Number.isNaN(data.getTime())
+        ? "--:--:--"
+        : data.toLocaleTimeString("pt-BR", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false
+          });
+    } else {
+      ultimaLeitura.textContent = "--:--:--";
+    }
+  }
 }
 
 async function loadAll(){
