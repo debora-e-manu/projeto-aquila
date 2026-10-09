@@ -57,49 +57,6 @@ app.post('/api/medicoes', async (req, res) => {
     }
 });
 
-
-    
-});
-
-
-// ========================================
-// BUSCAR MEDIÇÕES
-// ========================================
-
-
-app.post('/api/medicoes', async (req, res) => {
-
-    const { nivel1, nivel2, vazao, bomba } = req.body;
-
-    const estadoBomba = bomba === 'ligada' ? 'ligada' : 'desligada';
-
-    try {
-
-        await pool.query(
-            `INSERT INTO medicoes (nivel1, nivel2, vazao, bomba)
-             VALUES ($1, $2, $3, $4)`,
-            [nivel1, nivel2, vazao, estadoBomba]
-        );
-
-        res.json({
-            mensagem: 'Medição salva com sucesso!',
-            bomba: estadoBomba
-        });
-
-    } catch (erro) {
-
-        console.error('Erro ao salvar medição:', erro);
-
-        res.status(500).json({
-            erro: 'Erro ao salvar medição'
-        });
-
-    }
-});
-
-
-
-
  // ========================================
  // STATUS ATUAL
  // ========================================
