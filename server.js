@@ -234,11 +234,26 @@ app.get('/api/health', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, '0.0.0.0', () => {
+async function iniciarServidor() {
+    try {
+        await pool.query(`
+            ALTER TABLE medicoes
+            ADD COLUMN IF NOT EXISTS bomba VARCHAR(10) DEFAULT 'desligada'
+        `);
 
-    console.log('====================================');
-    console.log('🚀 ÁQUILA ONLINE');
-    console.log(`🌐 Porta: ${PORT}`);
-    console.log('====================================');
+        console.log('✅ Coluna bomba verificada no banco!');
 
-});
+    } catch (erro) {
+        console.error('❌ Erro ao preparar a coluna bomba:', erro);
+    }
+
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log('====================================');
+        console.log('🚀 ÁQUILA ONLINE');
+        console.log(`🌐 Porta: ${PORT}`);
+        console.log('====================================');
+    });
+}
+
+iniciarServidor();
+
