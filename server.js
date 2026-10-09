@@ -58,7 +58,7 @@ app.post('/api/medicoes', async (req, res) => {
 });
 
 
-    }
+    
 });
 
 
