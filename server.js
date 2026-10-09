@@ -64,7 +64,7 @@ app.post('/api/medicoes', async (req, res) => {
 app.get('/api/status', async (req, res) => {
     try {
         const resultado = await pool.query(
-            `SELECT nivel1, nivel2, vazao, data_hora
+            `SELECT nivel1, nivel2, vazao, bomba, data_hora
              FROM medicoes
              ORDER BY id DESC
              LIMIT 1`
@@ -97,6 +97,7 @@ app.get('/api/status', async (req, res) => {
             nivel1: Number(ultima.nivel1),
             nivel2: Number(ultima.nivel2),
             vazao: Number(ultima.vazao),
+            bomba: ultima.bomba,
             sensor: sensorAtivo ? 'ativo' : 'inativo',
             timestamp: ultima.data_hora
         });
