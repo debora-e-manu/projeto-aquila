@@ -22,18 +22,121 @@ function nav(page){
 $$(".nav-item").forEach(b=>b.onclick=()=>nav(b.dataset.page));
 $$("[data-page-target]").forEach(b=>b.onclick=()=>nav(b.dataset.pageTarget));
 
-function drawChart(canvas, data){
-  const c=canvas,ctx=c.getContext("2d"),dpr=devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;
-  c.width=w*dpr;c.height=h*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);
-  if(!data.length)return;
-  const vals=data.map(x=>Number(x.nivel)), min=Math.min(...vals),max=Math.max(...vals), pad=22;
-  ctx.strokeStyle="#17324b";ctx.lineWidth=1;
-  for(let i=0;i<4;i++){let y=pad+i*(h-pad*2)/3;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(w-pad,y);ctx.stroke()}
-  ctx.strokeStyle="#32a8ff";ctx.lineWidth=3;ctx.beginPath();
-  data.forEach((p,i)=>{let x=pad+i*(w-pad*2)/Math.max(1,data.length-1);let y=h-pad-((p.nivel-min)/Math.max(1,max-min))*(h-pad*2);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});
+
+function drawChart(canvas, data) {
+  const ctx = canvas.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+
+  if (!data || data.length === 0) {
+    ctx.fillStyle = "#8ca9c5";
+    ctx.font = "14px sans-serif";
+    ctx.fillText("Nenhuma medição neste período", 20, 35);
+    return;
+  }
+
+  // Escala do nível: 0% a 100%
+  const min = 0;
+  const max = 100;
+
+  const left = 48;
+  const right = 18;
+  const top = 24;
+  const bottom = 48;
+  const graphW = w - left - right;
+  const graphH = h - top - bottom;
+
+  const x = i => left + (i / Math.max(1, data.length - 1)) * graphW;
+  const y = value => top + (1 - Math.max(0, Math.min(100, Number(value))) / 100) * graphH;
+
+  ctx.font = "11px sans-serif";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+
+  // Linhas e escala vertical
+  for (let value = 0; value <= 100; value += 25) {
+    const py = y(value);
+
+    ctx.strokeStyle = "#17324b";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(left, py);
+    ctx.lineTo(w - right, py);
+    ctx.stroke();
+
+    ctx.fillStyle = "#8ca9c5";
+    ctx.fillText(value + "%", left - 8, py);
+  }
+
+  // Linha do nível medido
+  ctx.beginPath();
+  ctx.strokeStyle = "#32a8ff";
+  ctx.lineWidth = 2;
+
+  data.forEach((p, i) => {
+    const px = x(i);
+    const py = y(p.nivel);
+
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  });
+
   ctx.stroke();
-  ctx.lineTo(w-pad,h-pad);ctx.lineTo(pad,h-pad);ctx.closePath();ctx.globalAlpha=.08;ctx.fillStyle="#32a8ff";ctx.fill();ctx.globalAlpha=1;
+
+  // Pontos das medições
+  data.forEach((p, i) => {
+    const px = x(i);
+    const py = y(p.nivel);
+
+    ctx.beginPath();
+    ctx.arc(px, py, 3, 0, Math.PI * 2);
+    ctx.fillStyle = "#32a8ff";
+    ctx.fill();
+
+    // Valores exatos nos pontos
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "11px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+
+    if (data.length <= 20) {
+      ctx.fillText(Number(p.nivel).toFixed(1) + "%", px, py - 7);
+    }
+  });
+
+  // Horários no eixo horizontal
+  const quantidade = Math.min(6, data.length);
+
+  ctx.fillStyle = "#8ca9c5";
+  ctx.font = "10px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+
+  for (let i = 0; i < quantidade; i++) {
+    const indice = Math.round(
+      i * (data.length - 1) / Math.max(1, quantidade - 1)
+    );
+
+    const dataHora = new Date(data[indice].timestamp);
+
+    const horario = Number.isNaN(dataHora.getTime())
+      ? "--:--"
+      : dataHora.toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false
+        });
+
+    ctx.fillText(horario, x(indice), h - bottom + 12);
+  }
 }
+
 function renderMainChart(){drawChart($("#levelChart"),historyData.slice(-24))}
 
 function renderBigChart() {
