@@ -35,11 +35,51 @@ function drawChart(canvas, data){
   ctx.lineTo(w-pad,h-pad);ctx.lineTo(pad,h-pad);ctx.closePath();ctx.globalAlpha=.08;ctx.fillStyle="#32a8ff";ctx.fill();ctx.globalAlpha=1;
 }
 function renderMainChart(){drawChart($("#levelChart"),historyData.slice(-24))}
-function renderBigChart(){
-  const data=chartRange===24?historyData.slice(-24):historyData;
-  drawChart($("#bigChart"),data);
-  if(data.length){const v=data.map(x=>+x.nivel);$("#avgLevel").textContent=(v.reduce((a,b)=>a+b,0)/v.length).toFixed(1)+"%";$("#minLevel").textContent=Math.min(...v).toFixed(0)+"%";$("#maxLevel").textContent=Math.max(...v).toFixed(0)+"%"}
+
+function renderBigChart() {
+  const agora = Date.now();
+  const periodoMs = chartRange === 24
+    ? 24 * 60 * 60 * 1000
+    : 7 * 24 * 60 * 60 * 1000;
+
+  // Mantém apenas medições dentro do período escolhido
+  const dataPeriodo = historyData.filter(item => {
+    const tempo = new Date(item.timestamp).getTime();
+    return Number.isFinite(tempo) && tempo >= agora - periodoMs && tempo <= agora;
+  });
+
+  // Limita o número de pontos exibidos
+  const limitePontos = chartRange === 24 ? 48 : 84;
+  let data = dataPeriodo;
+
+  if (dataPeriodo.length > limitePontos) {
+    const passo = (dataPeriodo.length - 1) / (limitePontos - 1);
+
+    data = Array.from({ length: limitePontos }, (_, i) => {
+      return dataPeriodo[Math.round(i * passo)];
+    });
+  }
+
+  drawChart($("#bigChart"), data);
+
+  if (dataPeriodo.length) {
+    const valores = dataPeriodo.map(item => Number(item.nivel)).filter(Number.isFinite);
+
+    if (valores.length) {
+      $("#avgLevel").textContent =
+        (valores.reduce((soma, valor) => soma + valor, 0) / valores.length).toFixed(1) + "%";
+
+      $("#minLevel").textContent = Math.min(...valores).toFixed(0) + "%";
+      $("#maxLevel").textContent = Math.max(...valores).toFixed(0) + "%";
+    }
+  } else {
+    $("#avgLevel").textContent = "--%";
+    $("#minLevel").textContent = "--%";
+    $("#maxLevel").textContent = "--%";
+  }
 }
+
+
 function renderHistory(){
   const q=$("#historySearch").value.toLowerCase();
   $("#historyBody").innerHTML=historyData.slice().reverse().filter(x=>JSON.stringify(x).toLowerCase().includes(q)).map(x=>`
