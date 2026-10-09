@@ -82,14 +82,13 @@ app.get('/api/medicoes', async (req, res) => {
 });
 
 
-// ========================================
-// STATUS ATUAL
-// ========================================
+
+ // ========================================
+ // STATUS ATUAL
+ // ========================================
 
 app.get('/api/status', async (req, res) => {
-
     try {
-
         const resultado = await pool.query(
             `SELECT nivel1, nivel2, vazao, data_hora
              FROM medicoes
@@ -98,7 +97,6 @@ app.get('/api/status', async (req, res) => {
         );
 
         if (resultado.rows.length === 0) {
-
             return res.json({
                 nivel1: 0,
                 nivel2: 0,
@@ -106,27 +104,35 @@ app.get('/api/status', async (req, res) => {
                 sensor: 'sem dados',
                 timestamp: null
             });
-
         }
 
         const ultima = resultado.rows[0];
 
-        res.json({
+        // Considera ativo somente se a última medição
+        // tiver sido recebida nos últimos 30 segundos.
+        const agora = Date.now();
+        const horarioMedicao = new Date(ultima.data_hora).getTime();
+        const idadeMedicao = agora - horarioMedicao;
+
+        const sensorAtivo =
+            Number.isFinite(horarioMedicao) &&
+            idadeMedicao >= 0 &&
+            idadeMedicao <= 30000;
+
+        return res.json({
             nivel1: Number(ultima.nivel1),
             nivel2: Number(ultima.nivel2),
             vazao: Number(ultima.vazao),
-            sensor: 'ativo',
+            sensor: sensorAtivo ? 'ativo' : 'sem comunicação',
             timestamp: ultima.data_hora
         });
 
     } catch (erro) {
-
         console.error('Erro ao buscar status:', erro);
 
-        res.status(500).json({
+        return res.status(500).json({
             erro: 'Erro ao buscar status'
         });
-
     }
 });
 
