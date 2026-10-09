@@ -123,7 +123,7 @@ app.get('/api/status', async (req, res) => {
             nivel1: Number(ultima.nivel1),
             nivel2: Number(ultima.nivel2),
             vazao: Number(ultima.vazao),
-            sensor: sensorAtivo ? 'ativo' : 'sem comunicação',
+            sensor: sensorAtivo ? 'ativo' : 'inativo',
             timestamp: ultima.data_hora
         });
 
