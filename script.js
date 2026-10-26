@@ -274,9 +274,9 @@ alertsData=a;
 
 applyStatus(s);
 
-$("#apiDot").style.background="#27d17f";
-$("#apiText").textContent="API conectada";
-    $("#apiDot").style.background="#27d17f";$("#apiText").textContent="API conectada";
+
+  $("#apiDot").style.background="#27d17f";
+  $("#apiText").textContent="API conectada";
   }catch(e){
   console.error("ERRO NO PAINEL:", e);
   $("#apiDot").style.background="#e35b67";
