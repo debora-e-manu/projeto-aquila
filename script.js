@@ -309,6 +309,21 @@ function fillSettings(){if(!configData)return;$("#capacityInput").value=configDa
 $("#settingsForm").onsubmit=async e=>{e.preventDefault();const body={capacidade:+$("#capacityInput").value,altura:+$("#heightInput").value,minimo:+$("#minInput").value,maximo:+$("#maxInput").value,calibracao:+$("#calibrationInput").value};try{configData=await api("/configuracoes",{method:"POST",body:JSON.stringify(body)});applyStatus(await api("/status"));toast("Configurações salvas")}catch(e){toast("Erro ao salvar")}};
 $("#resetBtn").onclick=async()=>{try{configData=await api("/configuracoes",{method:"POST",body:JSON.stringify({capacidade:2000,altura:2.0,minimo:20,maximo:90,calibracao:1.0})});fillSettings();applyStatus(await api("/status"));toast("Padrões restaurados")}catch(e){toast("Erro ao restaurar")}};
 setInterval(()=>$("#clock").textContent=new Date().toLocaleString("pt-BR"),1000);
-setInterval(loadAll,5000);
+let atualizacaoEmAndamento = false;
+
+async function atualizarAutomaticamente() {
+  if (atualizacaoEmAndamento) return;
+
+  atualizacaoEmAndamento = true;
+
+  try {
+    await loadAll();
+  } finally {
+    atualizacaoEmAndamento = false;
+  }
+}
+
+atualizarAutomaticamente();
+setInterval(atualizarAutomaticamente, 5000);
 window.addEventListener("resize",()=>{renderMainChart();if($("#graficos").classList.contains("active"))renderBigChart()});
 loadAll();
