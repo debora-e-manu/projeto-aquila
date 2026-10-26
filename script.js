@@ -242,9 +242,6 @@ function applyStatus(s){
   }
 
   // Horário da última medição recebida
-  
-  // Horário da última medição recebida
-  // Horário da última medição recebida
   const ultimaLeitura = $("#lastUpdate");
 
   if (ultimaLeitura) {
@@ -263,43 +260,30 @@ function applyStatus(s){
       ultimaLeitura.textContent = "--:--:--";
     }
   }
-
 }
-async function loadAll() {
-  try {
+
+async function loadAll(){
+  try{
     const s = await api("/status");
+    const h = await api("/historico");
+    const a = await api("/alertas");
+    const c = await api("/configuracoes");
+    configData=c;
+historyData=h;
+alertsData=a;
 
-    applyStatus(s);
+applyStatus(s);
 
-    $("#apiDot").style.background = "#27d17f";
-    $("#apiDot").style.boxShadow = "0 0 10px #27d17f";
-    $("#apiText").textContent = "API conectada";
-
-    const resultados = await Promise.allSettled([
-      api("/historico"),
-      api("/alertas"),
-      api("/configuracoes")
-    ]);
-
-    if (resultados[0].status === "fulfilled") {
-      historyData = resultados[0].value;
-    }
-
-    if (resultados[1].status === "fulfilled") {
-      alertsData = resultados[1].value;
-    }
-
-    if (resultados[2].status === "fulfilled") {
-      configData = resultados[2].value;
-    }
-  } catch (e) {
-    console.error("ERRO NO PAINEL:", e);
-    $("#apiDot").style.background = "#e35b67";
-    $("#apiDot").style.boxShadow = "0 0 10px #e35b67";
-    $("#apiText").textContent = "API offline";
+$("#apiDot").style.background="#27d17f";
+$("#apiText").textContent="API conectada";
+    $("#apiDot").style.background="#27d17f";$("#apiText").textContent="API conectada";
+  }catch(e){
+  console.error("ERRO NO PAINEL:", e);
+  $("#apiDot").style.background="#e35b67";
+  $("#apiDot").style.boxShadow="0 0 10px #e35b67";
+  $("#apiText").textContent="API offline";
   }
 }
-
 $("#refreshBtn").onclick=async()=>{await loadAll();toast("Dados atualizados")};
 $("#historySearch").oninput=renderHistory;
 $("#exportBtn").onclick=()=>{const rows=[["timestamp","nivel","volume","vazao","bomba","sensor"],...historyData.map(x=>[x.timestamp,x.nivel,x.volume,x.vazao,x.sensor])];const csv=rows.map(r=>r.join(";")).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="aquila_historico.csv";a.click()};
@@ -309,21 +293,6 @@ function fillSettings(){if(!configData)return;$("#capacityInput").value=configDa
 $("#settingsForm").onsubmit=async e=>{e.preventDefault();const body={capacidade:+$("#capacityInput").value,altura:+$("#heightInput").value,minimo:+$("#minInput").value,maximo:+$("#maxInput").value,calibracao:+$("#calibrationInput").value};try{configData=await api("/configuracoes",{method:"POST",body:JSON.stringify(body)});applyStatus(await api("/status"));toast("Configurações salvas")}catch(e){toast("Erro ao salvar")}};
 $("#resetBtn").onclick=async()=>{try{configData=await api("/configuracoes",{method:"POST",body:JSON.stringify({capacidade:2000,altura:2.0,minimo:20,maximo:90,calibracao:1.0})});fillSettings();applyStatus(await api("/status"));toast("Padrões restaurados")}catch(e){toast("Erro ao restaurar")}};
 setInterval(()=>$("#clock").textContent=new Date().toLocaleString("pt-BR"),1000);
-let atualizacaoEmAndamento = false;
-
-async function atualizarAutomaticamente() {
-  if (atualizacaoEmAndamento) return;
-
-  atualizacaoEmAndamento = true;
-
-  try {
-    await loadAll();
-  } finally {
-    atualizacaoEmAndamento = false;
-  }
-}
-
-atualizarAutomaticamente();
-setInterval(atualizarAutomaticamente, 5000);
+setInterval(loadAll,5000);
 window.addEventListener("resize",()=>{renderMainChart();if($("#graficos").classList.contains("active"))renderBigChart()});
 loadAll();
