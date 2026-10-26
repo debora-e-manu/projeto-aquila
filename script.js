@@ -262,26 +262,54 @@ function applyStatus(s){
   }
 }
 
-async function loadAll(){
-  try{
-    const s = await api("/status");
-    const h = await api("/historico");
-    const a = await api("/alertas");
-    const c = await api("/configuracoes");
-    configData=c;
-historyData=h;
-alertsData=a;
+async function loadAll() {
+  let s;
 
-applyStatus(s);
+  // Primeiro, verifica a comunicação com a API.
+  try {
+    s = await api("/status");
 
+    applyStatus(s);
 
-  $("#apiDot").style.background="#27d17f";
-  $("#apiText").textContent="API conectada";
-  }catch(e){
-  console.error("ERRO NO PAINEL:", e);
-  $("#apiDot").style.background="#e35b67";
-  $("#apiDot").style.boxShadow="0 0 10px #e35b67";
-  $("#apiText").textContent="API offline";
+    $("#apiDot").style.background = "#27d17f";
+    $("#apiDot").style.boxShadow = "0 0 10px #27d17f";
+    $("#apiText").textContent = "API conectada";
+  } catch (e) {
+    console.error("Erro ao conectar com a API:", e);
+
+    $("#apiDot").style.background = "#e35b67";
+    $("#apiDot").style.boxShadow = "0 0 10px #e35b67";
+    $("#apiText").textContent = "API offline";
+
+    return;
+  }
+
+  // Depois, carrega o histórico, os alertas e as configurações.
+  const resultados = await Promise.allSettled([
+    api("/historico"),
+    api("/alertas"),
+    api("/configuracoes")
+  ]);
+
+  if (resultados[0].status === "fulfilled") {
+    historyData = resultados[0].value;
+  }
+
+  if (resultados[1].status === "fulfilled") {
+    alertsData = resultados[1].value;
+  }
+
+  if (resultados[2].status === "fulfilled") {
+    configData = resultados[2].value;
+  }
+
+  try {
+    renderMainChart();
+    renderHistory();
+    renderAlerts();
+    fillSettings();
+  } catch (e) {
+    console.error("Erro ao atualizar os dados do painel:", e);
   }
 }
 $("#refreshBtn").onclick=async()=>{await loadAll();toast("Dados atualizados")};
