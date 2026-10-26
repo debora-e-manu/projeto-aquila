@@ -283,7 +283,6 @@ $("#apiText").textContent="API conectada";
   $("#apiText").textContent="API offline";
   }
 }
-$("#refreshBtn").onclick=async()=>{await loadAll();toast("Dados atualizados")};
 $("#historySearch").oninput=renderHistory;
 $("#exportBtn").onclick=()=>{const rows=[["timestamp","nivel","volume","vazao","bomba","sensor"],...historyData.map(x=>[x.timestamp,x.nivel,x.volume,x.vazao,x.sensor])];const csv=rows.map(r=>r.join(";")).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="aquila_historico.csv";a.click()};
 $$(".segmented button").forEach(b=>b.onclick=()=>{$$(".segmented button").forEach(x=>x.classList.remove("active"));b.classList.add("active");chartRange=+b.dataset.range;renderBigChart()});
