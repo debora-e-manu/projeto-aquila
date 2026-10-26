@@ -265,29 +265,41 @@ function applyStatus(s){
   }
 
 }
-
-async function loadAll(){
-  try{
+async function loadAll() {
+  try {
     const s = await api("/status");
-    const h = await api("/historico");
-    const a = await api("/alertas");
-    const c = await api("/configuracoes");
-    configData=c;
-historyData=h;
-alertsData=a;
 
-applyStatus(s);
+    applyStatus(s);
 
-$("#apiDot").style.background="#27d17f";
-$("#apiText").textContent="API conectada";
-    $("#apiDot").style.background="#27d17f";$("#apiText").textContent="API conectada";
-  }catch(e){
-  console.error("ERRO NO PAINEL:", e);
-  $("#apiDot").style.background="#e35b67";
-  $("#apiDot").style.boxShadow="0 0 10px #e35b67";
-  $("#apiText").textContent="API offline";
+    $("#apiDot").style.background = "#27d17f";
+    $("#apiDot").style.boxShadow = "0 0 10px #27d17f";
+    $("#apiText").textContent = "API conectada";
+
+    const resultados = await Promise.allSettled([
+      api("/historico"),
+      api("/alertas"),
+      api("/configuracoes")
+    ]);
+
+    if (resultados[0].status === "fulfilled") {
+      historyData = resultados[0].value;
+    }
+
+    if (resultados[1].status === "fulfilled") {
+      alertsData = resultados[1].value;
+    }
+
+    if (resultados[2].status === "fulfilled") {
+      configData = resultados[2].value;
+    }
+  } catch (e) {
+    console.error("ERRO NO PAINEL:", e);
+    $("#apiDot").style.background = "#e35b67";
+    $("#apiDot").style.boxShadow = "0 0 10px #e35b67";
+    $("#apiText").textContent = "API offline";
   }
 }
+
 $("#refreshBtn").onclick=async()=>{await loadAll();toast("Dados atualizados")};
 $("#historySearch").oninput=renderHistory;
 $("#exportBtn").onclick=()=>{const rows=[["timestamp","nivel","volume","vazao","bomba","sensor"],...historyData.map(x=>[x.timestamp,x.nivel,x.volume,x.vazao,x.sensor])];const csv=rows.map(r=>r.join(";")).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="aquila_historico.csv";a.click()};
