@@ -242,6 +242,8 @@ function applyStatus(s){
   }
 
   // Horário da última medição recebida
+  
+  // Horário da última medição recebida
   const ultimaLeitura = $("#lastUpdate");
 
   if (ultimaLeitura) {
@@ -251,6 +253,7 @@ function applyStatus(s){
       ultimaLeitura.textContent = Number.isNaN(data.getTime())
         ? "--:--:--"
         : data.toLocaleTimeString("pt-BR", {
+            timeZone: "America/Fortaleza",
             hour: "2-digit",
             minute: "2-digit",
             second: "2-digit",
@@ -260,6 +263,7 @@ function applyStatus(s){
       ultimaLeitura.textContent = "--:--:--";
     }
   }
+
 }
 
 async function loadAll(){
